@@ -1,7 +1,5 @@
 package client
 
-import "k8s.io/kubernetes/pkg/api"
-
 type (
 	// ReplicaSetInterface has methods to work with ReplicaSet resources.
 	ReplicaSetInterface interface {
@@ -57,6 +55,6 @@ type (
 
 		// Template is the object that describes the pod that will be created if
 		// insufficient replicas are detected.
-		Template api.PodTemplateSpec `json:"template,omitempty"`
+		Template PodTemplateSpec `json:"template,omitempty"`
 	}
 )

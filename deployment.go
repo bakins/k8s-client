@@ -1,6 +1,6 @@
 package client
 
-import "k8s.io/kubernetes/pkg/util/intstr"
+import "github.com/YakLabs/k8s-client/intstr"
 
 const (
 	// Kill all existing pods before creating new ones.
