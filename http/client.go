@@ -161,7 +161,6 @@ func (c *Client) newRequest(method, path string, v interface{}) (*http.Request, 
 }
 
 func (c *Client) do(method, path string, in interface{}, out interface{}, codes ...int) (int, error) {
-	fmt.Printf("client HTTP: %s %s\n", method, path)
 	req, err := c.newRequest(method, path, in)
 	if err != nil {
 		return 0, err
