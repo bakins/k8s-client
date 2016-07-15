@@ -6,6 +6,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	http "net/http"
 	"net/url"
@@ -160,6 +161,18 @@ func (c *Client) newRequest(method, path string, v interface{}) (*http.Request, 
 	return req, nil
 }
 
+func readStatus(body io.Reader) (*k8s.Status, error) {
+	data, err := ioutil.ReadAll(body)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to read response body")
+	}
+	var out k8s.Status
+	if err := json.Unmarshal(data, &out); err != nil {
+		return nil, errors.Wrap(err, "unable to unmarshal status")
+	}
+	return &out, nil
+}
+
 func (c *Client) do(method, path string, in interface{}, out interface{}, codes ...int) (int, error) {
 	req, err := c.newRequest(method, path, in)
 	if err != nil {
@@ -191,12 +204,11 @@ func (c *Client) do(method, path string, in interface{}, out interface{}, codes 
 	}
 
 	if !found {
-		switch resp.StatusCode {
-		case 404:
-			return 404, k8s.NewNotFoundError(req.URL.String())
-		default:
-			return resp.StatusCode, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+		status, err := readStatus(resp.Body)
+		if err != nil {
+			return resp.StatusCode, errors.Wrapf(err, "unable to read status: %d", resp.StatusCode)
 		}
+		return resp.StatusCode, status
 	}
 
 	if out != nil {
