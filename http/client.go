@@ -28,6 +28,7 @@ import (
 
 const (
 	tokenFile = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+	caFile    = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
 )
 
 type (
@@ -112,7 +113,7 @@ func NewInCluster() (*Client, error) {
 		return nil, errors.Wrap(err, "failed to read token file: "+tokenFile)
 	}
 
-	return New(SetToken(string(token)), SetServer(server))
+	return New(SetToken(string(token)), SetServer(server), SetCAFromFile(caFile))
 }
 
 // SetUsername sets the username to be used for authentication.
