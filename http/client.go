@@ -38,8 +38,9 @@ type (
 		token              string
 		authHeader         string
 		server             string
-		caCert             string
 		certPool           *x509.CertPool
+		clientCert         []byte
+		clientKey          []byte
 		insecureSkipVerify bool
 		client             *http.Client
 	}
@@ -69,6 +70,15 @@ func New(options ...OptionsFunc) (*Client, error) {
 			tr.TLSClientConfig.RootCAs = c.certPool
 		}
 
+		if c.clientCert != nil && c.clientKey != nil {
+			cert, err := tls.X509KeyPair(c.clientCert, c.clientKey)
+			if err != nil {
+				return nil, errors.Wrap(err, "X509KeyPair failed")
+			}
+			tr.TLSClientConfig.Certificates = []tls.Certificate{cert}
+			tr.TLSClientConfig.BuildNameToCertificate()
+		}
+
 		c.client = &http.Client{
 			Transport: tr,
 		}
@@ -77,7 +87,9 @@ func New(options ...OptionsFunc) (*Client, error) {
 	if c.token != "" {
 		c.authHeader = "Bearer " + c.token
 	} else {
-		c.authHeader = base64.StdEncoding.EncodeToString([]byte(c.username + ":" + c.password))
+		if c.username != "" {
+			c.authHeader = base64.StdEncoding.EncodeToString([]byte(c.username + ":" + c.password))
+		}
 	}
 
 	return c, nil
@@ -170,6 +182,44 @@ func SetCAFromFile(path string) func(*Client) error {
 	}
 }
 
+// SetClientCert sets the certificate to be used for authentication.
+func SetClientCert(cert []byte) func(*Client) error {
+	return func(c *Client) error {
+		c.clientCert = cert
+		return nil
+	}
+}
+
+// SetClientCertFromFile sets the certificate to be used for authentication from a file.
+func SetClientCertFromFile(path string) func(*Client) error {
+	return func(c *Client) error {
+		data, err := ioutil.ReadFile(path)
+		if err != nil {
+			return err
+		}
+		return SetClientCert(data)(c)
+	}
+}
+
+// SetClientKey sets the key to be used for authentication.
+func SetClientKey(key []byte) func(*Client) error {
+	return func(c *Client) error {
+		c.clientKey = key
+		return nil
+	}
+}
+
+// SetClientKeyFromFile sets the key to be used for authentication from a file.
+func SetClientKeyFromFile(path string) func(*Client) error {
+	return func(c *Client) error {
+		data, err := ioutil.ReadFile(path)
+		if err != nil {
+			return err
+		}
+		return SetClientKey(data)(c)
+	}
+}
+
 // SetInsecureSkipVerify allows the caller to skip verification of the servers cert
 func SetInsecureSkipVerify(skip bool) func(*Client) error {
 	return func(c *Client) error {
@@ -187,7 +237,9 @@ func (c *Client) newRequest(method, path string, v interface{}) (*http.Request, 
 		if err != nil {
 			return nil, err
 		}
-		req.Header.Add("Authorization", c.authHeader)
+		if c.authHeader != "" {
+			req.Header.Add("Authorization", c.authHeader)
+		}
 		return req, nil
 	}
 	// weirdness with passing nil interface, so just copy/paste
