@@ -16,7 +16,15 @@ func testClient(t *testing.T) *http.Client {
 		server = "http://127.0.0.1:8001"
 	}
 
-	c, err := http.New(http.SetServer(server))
+	opts := []http.OptionsFunc{
+		http.SetServer(server),
+	}
+
+	if caFile := os.Getenv("K8S_CAFILE"); caFile != "" {
+		opts = append(opts, http.SetCAFromFile(caFile))
+	}
+
+	c, err := http.New(opts...)
 	require.Nil(t, err)
 
 	return c
