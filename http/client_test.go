@@ -24,6 +24,14 @@ func testClient(t *testing.T) *http.Client {
 		opts = append(opts, http.SetCAFromFile(caFile))
 	}
 
+	if clientCert := os.Getenv("K8S_CLIENTCERT"); clientCert != "" {
+		opts = append(opts, http.SetClientCertFromFile(clientCert))
+	}
+
+	if clientKey := os.Getenv("K8S_CLIENTKEY"); clientKey != "" {
+		opts = append(opts, http.SetClientKeyFromFile(clientKey))
+	}
+
 	c, err := http.New(opts...)
 	require.Nil(t, err)
 
