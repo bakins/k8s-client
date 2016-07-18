@@ -3,6 +3,7 @@ package http
 import (
 	"bytes"
 	"crypto/tls"
+	"crypto/x509"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -32,12 +33,15 @@ const (
 type (
 	// Client is an http client for kubernetes
 	Client struct {
-		username   string
-		password   string
-		token      string
-		authHeader string
-		server     string
-		client     *http.Client
+		username           string
+		password           string
+		token              string
+		authHeader         string
+		server             string
+		caCert             string
+		certPool           *x509.CertPool
+		insecureSkipVerify bool
+		client             *http.Client
 	}
 
 	// OptionsFunc is a function passed to new for setting options on a new client.
@@ -57,9 +61,14 @@ func New(options ...OptionsFunc) (*Client, error) {
 		// TODO: allow passing in CA to use.
 		tr := &http.Transport{
 			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: true,
+				InsecureSkipVerify: c.insecureSkipVerify,
 			},
 		}
+
+		if c.certPool != nil {
+			tr.TLSClientConfig.RootCAs = c.certPool
+		}
+
 		c.client = &http.Client{
 			Transport: tr,
 		}
@@ -139,6 +148,36 @@ func SetClient(client *http.Client) func(*Client) error {
 	}
 }
 
+// SetCA sets a CA to verify the servers certificate
+func SetCA(cert []byte) func(*Client) error {
+	return func(c *Client) error {
+		c.certPool = x509.NewCertPool()
+		if ok := c.certPool.AppendCertsFromPEM(cert); !ok {
+			return errors.New("AppendCertsFromPEM failed")
+		}
+		return nil
+	}
+}
+
+// SetCA sets a CA to verify the servers certificate from a file
+func SetCAFromFile(path string) func(*Client) error {
+	return func(c *Client) error {
+		data, err := ioutil.ReadFile(path)
+		if err != nil {
+			return err
+		}
+		fmt.Println(string(data))
+		return SetCA(data)(c)
+	}
+}
+
+// SetInsecureSkipVerify allows the caller to skip verification of the servers cert
+func SetInsecureSkipVerify(skip bool) func(*Client) error {
+	return func(c *Client) error {
+		c.insecureSkipVerify = skip
+		return nil
+	}
+}
 func (c *Client) newRequest(method, path string, v interface{}) (*http.Request, error) {
 	if v != nil {
 		data, err := json.Marshal(v)
