@@ -1,7 +1,6 @@
 package http_test
 
 import (
-	"fmt"
 	"os"
 	"testing"
 
@@ -22,7 +21,6 @@ func testClient(t *testing.T) *http.Client {
 	}
 
 	if caFile := os.Getenv("K8S_CAFILE"); caFile != "" {
-		fmt.Println("adding ca file ", caFile)
 		opts = append(opts, http.SetCAFromFile(caFile))
 	}
 

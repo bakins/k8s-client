@@ -166,7 +166,6 @@ func SetCAFromFile(path string) func(*Client) error {
 		if err != nil {
 			return err
 		}
-		fmt.Println(string(data))
 		return SetCA(data)(c)
 	}
 }
