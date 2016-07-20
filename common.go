@@ -1,10 +1,5 @@
 package client
 
-import (
-	"encoding/json"
-	"time"
-)
-
 // Common object elements
 
 type (
@@ -47,10 +42,6 @@ type (
 		Name string
 	}
 
-	Time struct {
-		time.Time
-	}
-
 	ObjectFieldSelector struct {
 		APIVersion string `json:"apiVersion"`
 		FieldPath  string `json:"fieldPath"`
@@ -88,15 +79,6 @@ type (
 		GetItems()
 	}
 )
-
-func (t Time) MarshalJSON() ([]byte, error) {
-	if t.IsZero() {
-		// Encode unset/nil objects as JSON's "null".
-		return []byte("null"), nil
-	}
-
-	return json.Marshal(t.UTC().Format(time.RFC3339))
-}
 
 func (t *TypeMeta) GetKind() string {
 	return t.Kind
