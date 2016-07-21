@@ -58,3 +58,26 @@ type (
 		Template PodTemplateSpec `json:"template,omitempty"`
 	}
 )
+
+// NewService creates a new ReplicaSet struct
+func NewReplicaSet(namespace, name string) *ReplicaSet {
+	return &ReplicaSet{
+		TypeMeta: TypeMeta{
+			Kind:       "ReplicaSet",
+			APIVersion: "extensions/v1beta1",
+		},
+		ObjectMeta: ObjectMeta{
+			Namespace:   namespace,
+			Name:        name,
+			Labels:      make(map[string]string),
+			Annotations: make(map[string]string),
+		},
+		Spec: ReplicaSetSpec{
+			Template: PodTemplateSpec{
+				ObjectMeta: ObjectMeta{
+					Labels: make(map[string]string),
+				},
+			},
+		},
+	}
+}

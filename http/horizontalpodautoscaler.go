@@ -25,7 +25,7 @@ func (c *Client) GetHorizontalPodAutoscaler(namespace, name string) (*k8s.Horizo
 // CreateHorizontalPodAutoscaler creates a new HorizontalPodAutoscaler. This will fail if it already exists.
 func (c *Client) CreateHorizontalPodAutoscaler(namespace string, item *k8s.HorizontalPodAutoscaler) (*k8s.HorizontalPodAutoscaler, error) {
 	item.TypeMeta.Kind = "HorizontalPodAutoscaler"
-	item.TypeMeta.APIVersion = "autoscale"
+	item.TypeMeta.APIVersion = "autoscaling/v1"
 	item.ObjectMeta.Namespace = namespace
 
 	var out k8s.HorizontalPodAutoscaler
@@ -57,7 +57,7 @@ func (c *Client) DeleteHorizontalPodAutoscaler(namespace, name string) error {
 // avoid update conflicts
 func (c *Client) UpdateHorizontalPodAutoscaler(namespace string, item *k8s.HorizontalPodAutoscaler) (*k8s.HorizontalPodAutoscaler, error) {
 	item.TypeMeta.Kind = "HorizontalPodAutoscaler"
-	item.TypeMeta.APIVersion = "autoscale"
+	item.TypeMeta.APIVersion = "autoscaling/v1"
 	item.ObjectMeta.Namespace = namespace
 
 	var out k8s.HorizontalPodAutoscaler

@@ -33,3 +33,20 @@ type (
 		Items []Namespace `json:"items"`
 	}
 )
+
+// NewNamespace creates a new namespace struct
+func NewNamespace(name string) *Namespace {
+	return &Namespace{
+		TypeMeta: TypeMeta{
+			Kind:       "Namespace",
+			APIVersion: "v1",
+		},
+		ObjectMeta: ObjectMeta{
+			Namespace:   name,
+			Name:        name,
+			Labels:      make(map[string]string),
+			Annotations: make(map[string]string),
+		},
+	}
+
+}

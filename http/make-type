@@ -6,13 +6,13 @@ APIPATH=`echo ${TYPE} | tr '[:upper:]' '[:lower:]'`
 APIVERSION=${2:-v1}
 
 case ${APIVERSION} in
-    "v1beta1")
+    "extensions/v1beta1")
         API=/apis/extensions/v1beta1
         ;;
     "v1")
         API=/api/v1
         ;;
-    "autoscale")
+    "autoscaling/v1")
         API=/apis/autoscaling/v1
         ;;
     *)

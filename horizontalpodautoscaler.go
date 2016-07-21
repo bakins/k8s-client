@@ -74,3 +74,19 @@ type (
 		APIVersion string `json:"apiVersion,omitempty" protobuf:"bytes,3,opt,name=apiVersion"`
 	}
 )
+
+// NewHorizontalPodAutoscalere creates a new HorizontalPodAutoscaler struct
+func NewHorizontalPodAutoscaler(namespace, name string) *HorizontalPodAutoscaler {
+	return &HorizontalPodAutoscaler{
+		TypeMeta: TypeMeta{
+			Kind:       "HorizontalPodAutoscaler",
+			APIVersion: "autoscaling",
+		},
+		ObjectMeta: ObjectMeta{
+			Namespace:   namespace,
+			Name:        name,
+			Labels:      make(map[string]string),
+			Annotations: make(map[string]string),
+		},
+	}
+}

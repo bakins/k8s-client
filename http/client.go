@@ -17,12 +17,12 @@ import (
 	"github.com/pkg/errors"
 )
 
-//go:generate ./make-type HorizontalPodAutoscaler autoscale
+//go:generate ./make-type HorizontalPodAutoscaler autoscaling/v1
 //go:generate ./make-type Secret v1
-//go:generate ./make-type Deployment v1beta1
+//go:generate ./make-type Deployment extensions/v1beta1
 //go:generate ./make-type Pod v1
 //go:generate ./make-type ConfigMap v1
-//go:generate ./make-type ReplicaSet v1beta1
+//go:generate ./make-type ReplicaSet extensions/v1beta1
 //go:generate ./make-type Service v1
 //go:generate ./make-type ServiceAccount v1
 
@@ -270,6 +270,7 @@ func (c *Client) do(method, path string, in interface{}, out interface{}, codes 
 		return 0, err
 	}
 
+	fmt.Println(method, path)
 	resp, err := c.client.Do(req)
 	if err != nil {
 		return 0, err

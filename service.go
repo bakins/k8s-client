@@ -150,3 +150,23 @@ type (
 		NodePort int32 `json:"nodePort"`
 	}
 )
+
+// NewService creates a new service struct
+func NewService(namespace, name string) *Service {
+	return &Service{
+		TypeMeta: TypeMeta{
+			Kind:       "Service",
+			APIVersion: "v1",
+		},
+		ObjectMeta: ObjectMeta{
+			Namespace:   namespace,
+			Name:        name,
+			Labels:      make(map[string]string),
+			Annotations: make(map[string]string),
+		},
+		Spec: ServiceSpec{
+			Ports:    make([]ServicePort, 0),
+			Selector: make(map[string]string),
+		},
+	}
+}
