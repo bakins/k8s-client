@@ -18,11 +18,8 @@ func TestSecretList(t *testing.T) {
 
 func TestSecretCreate(t *testing.T) {
 	withTestNamespace(t, func(t *testing.T, c *http.Client, n *client.Namespace) {
-		in := &client.Secret{
-			ObjectMeta: client.ObjectMeta{
-				Name: "test-secret",
-			},
-		}
+		in := client.NewSecret(n.Name, "test-secret")
+
 		out, err := c.CreateSecret(n.Name, in)
 		assert.Nil(t, err)
 		assert.NotNil(t, out)

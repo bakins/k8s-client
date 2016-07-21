@@ -25,7 +25,7 @@ func (c *Client) GetDeployment(namespace, name string) (*k8s.Deployment, error) 
 // CreateDeployment creates a new Deployment. This will fail if it already exists.
 func (c *Client) CreateDeployment(namespace string, item *k8s.Deployment) (*k8s.Deployment, error) {
 	item.TypeMeta.Kind = "Deployment"
-	item.TypeMeta.APIVersion = "v1beta1"
+	item.TypeMeta.APIVersion = "extensions/v1beta1"
 	item.ObjectMeta.Namespace = namespace
 
 	var out k8s.Deployment
@@ -57,7 +57,7 @@ func (c *Client) DeleteDeployment(namespace, name string) error {
 // avoid update conflicts
 func (c *Client) UpdateDeployment(namespace string, item *k8s.Deployment) (*k8s.Deployment, error) {
 	item.TypeMeta.Kind = "Deployment"
-	item.TypeMeta.APIVersion = "v1beta1"
+	item.TypeMeta.APIVersion = "extensions/v1beta1"
 	item.ObjectMeta.Namespace = namespace
 
 	var out k8s.Deployment

@@ -25,7 +25,7 @@ func (c *Client) GetReplicaSet(namespace, name string) (*k8s.ReplicaSet, error) 
 // CreateReplicaSet creates a new ReplicaSet. This will fail if it already exists.
 func (c *Client) CreateReplicaSet(namespace string, item *k8s.ReplicaSet) (*k8s.ReplicaSet, error) {
 	item.TypeMeta.Kind = "ReplicaSet"
-	item.TypeMeta.APIVersion = "v1beta1"
+	item.TypeMeta.APIVersion = "extensions/v1beta1"
 	item.ObjectMeta.Namespace = namespace
 
 	var out k8s.ReplicaSet
@@ -57,7 +57,7 @@ func (c *Client) DeleteReplicaSet(namespace, name string) error {
 // avoid update conflicts
 func (c *Client) UpdateReplicaSet(namespace string, item *k8s.ReplicaSet) (*k8s.ReplicaSet, error) {
 	item.TypeMeta.Kind = "ReplicaSet"
-	item.TypeMeta.APIVersion = "v1beta1"
+	item.TypeMeta.APIVersion = "extensions/v1beta1"
 	item.ObjectMeta.Namespace = namespace
 
 	var out k8s.ReplicaSet
