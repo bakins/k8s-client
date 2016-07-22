@@ -270,7 +270,6 @@ func (c *Client) do(method, path string, in interface{}, out interface{}, codes 
 		return 0, err
 	}
 
-	fmt.Println(method, path)
 	resp, err := c.client.Do(req)
 	if err != nil {
 		return 0, err
