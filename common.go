@@ -68,11 +68,14 @@ type (
 
 	Object interface {
 		GetKind() string
+		GetAnnotations() map[string]string
+		GetLabels() map[string]string
+		SetLabels(labels map[string]string)
 	}
+
 	NamespacedObject interface {
 		Object
 		GetNamespace() string
-		GetAnnotations() map[string]string
 	}
 	ListObject interface {
 		Object
@@ -90,4 +93,12 @@ func (o *ObjectMeta) GetNamespace() string {
 
 func (o *ObjectMeta) GetAnnotations() map[string]string {
 	return o.Annotations
+}
+
+func (o *ObjectMeta) GetLabels() map[string]string {
+	return o.Labels
+}
+
+func (o *ObjectMeta) SetLabels(labels map[string]string) {
+	o.Labels = labels
 }
