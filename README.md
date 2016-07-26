@@ -49,4 +49,9 @@ The tests will try to connect to Kubernetes at
 `http://127.0.0.1:8001`. This can be overriden using the `K8S_SERVER`
 environment value.
 
+## TODO
 
+- [ ] Mock client for testing
+- [ ] Better docs/examples
+- [ ] Support all the Kubernetes types and operations
+- [ ] Support watches
