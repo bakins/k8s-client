@@ -13,14 +13,16 @@ type (
 	}
 
 	ObjectMeta struct {
-		Name            string            `json:"name,omitempty"`
-		Namespace       string            `json:"namespace,omitempty"`
-		SelfLink        string            `json:"selfLink,omitempty"`
-		UID             UID               `json:"uid,omitempty"`
-		ResourceVersion string            `json:"resourceVersion,omitempty"`
-		Generation      int64             `json:"generation,omitempty"`
-		Labels          map[string]string `json:"labels,omitempty"`
-		Annotations     map[string]string `json:"annotations,omitempty"`
+		Name              string            `json:"name,omitempty"`
+		Namespace         string            `json:"namespace,omitempty"`
+		SelfLink          string            `json:"selfLink,omitempty"`
+		UID               UID               `json:"uid,omitempty"`
+		ResourceVersion   string            `json:"resourceVersion,omitempty"`
+		CreationTimestamp *Time             `json:"creationTimestamp,omitempty"`
+		DeletionTimestamp *Time             `json:"deletionTimestamp,omitempty"`
+		Generation        int64             `json:"generation,omitempty"`
+		Labels            map[string]string `json:"labels,omitempty"`
+		Annotations       map[string]string `json:"annotations,omitempty"`
 	}
 
 	ListMeta struct {
