@@ -41,7 +41,7 @@ type (
 	}
 
 	LocalObjectReference struct {
-		Name string
+		Name string `json:"name"`
 	}
 
 	ObjectFieldSelector struct {
