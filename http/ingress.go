@@ -36,8 +36,8 @@ func (c *Client) CreateIngress(namespace string, item *k8s.Ingress) (*k8s.Ingres
 	return &out, nil
 }
 
-// ListIngresss lists all Ingresss in a namespace
-func (c *Client) ListIngresss(namespace string, opts *k8s.ListOptions) (*k8s.IngressList, error) {
+// ListIngresses lists all Ingresss in a namespace
+func (c *Client) ListIngresses(namespace string, opts *k8s.ListOptions) (*k8s.IngressList, error) {
 	var out k8s.IngressList
 	_, err := c.do("GET", ingressGeneratePath(namespace, "")+"?"+listOptionsQuery(opts), nil, &out)
 	if err != nil {
