@@ -12,6 +12,7 @@ import (
 	http "net/http"
 	"net/url"
 	"os"
+	"strings"
 
 	k8s "github.com/YakLabs/k8s-client"
 	"github.com/pkg/errors"
@@ -322,18 +323,18 @@ func listOptionsQuery(opts *k8s.ListOptions) string {
 	}
 	val := url.Values{}
 	if opts.LabelSelector.MatchLabels != nil && len(opts.LabelSelector.MatchLabels) > 0 {
-		labels := url.Values{}
+		var labels []string
 		for k, v := range opts.LabelSelector.MatchLabels {
-			labels.Set(k, v)
+			labels = append(labels, fmt.Sprintf("%s=%s", k, v))
 		}
-		val.Set("labelSelector", labels.Encode())
+		val.Set("labelSelector", strings.Join(labels, ","))
 	}
 	if opts.FieldSelector != nil && len(opts.FieldSelector) > 0 {
-		fields := url.Values{}
+		var fields []string
 		for k, v := range opts.FieldSelector {
-			fields.Set(k, v)
+			fields = append(fields, fmt.Sprintf("%s=%s", k, v))
 		}
-		val.Set("fieldSelector", fields.Encode())
+		val.Set("fieldSelector", strings.Join(fields, ","))
 	}
 
 	return val.Encode()
