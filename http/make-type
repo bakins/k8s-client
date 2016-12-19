@@ -5,6 +5,8 @@ APIPATH=`echo ${TYPE} | tr '[:upper:]' '[:lower:]'`
 
 APIVERSION=${2:-v1}
 
+APIPATHEXT=${3:-s}
+
 case ${APIVERSION} in
     "extensions/v1beta1")
         API=/apis/extensions/v1beta1
@@ -32,9 +34,9 @@ import (
 
 func ${APIPATH}GeneratePath(namespace, name string) string {
     if name == "" {
-        return "${API}/namespaces/"+namespace+"/${APIPATH}s"
+        return "${API}/namespaces/"+namespace+"/${APIPATH}${APIPATHEXT}"
     }
-    return "${API}/namespaces/"+namespace+"/${APIPATH}s/"+name
+    return "${API}/namespaces/"+namespace+"/${APIPATH}${APIPATHEXT}/"+name
 }
 
 // Get${TYPE} fetches a single ${TYPE}

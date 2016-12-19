@@ -4,6 +4,7 @@ type (
 	// Client is an interface that represents a kubernetes client
 	Client interface {
 		ConfigMapInterface
+		DaemonSetInterface
 		DeploymentInterface
 		HorizontalPodAutoscalerInterface
 		IngressInterface
