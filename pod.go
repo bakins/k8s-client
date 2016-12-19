@@ -188,15 +188,49 @@ type (
 
 	VolumeSource struct {
 		EmptyDir *EmptyDirVolumeSource `json:"emptyDir,omitempty"`
+		HostPath *HostPathVolumeSource `json:"hostPath,omitempty"`
 		Secret   *SecretVolumeSource   `json:"secret,omitempty"`
 	}
 
+	// Represents an empty directory for a pod. Empty directory volumes support ownership management and SELinux relabeling.
 	EmptyDirVolumeSource struct {
 		Medium StorageMedium `json:"medium,omitempty"`
 	}
 
+	// Represents a host path mapped into a pod. Host path volumes do not support ownership management or SELinux relabeling.
+	HostPathVolumeSource struct {
+		// Path of the directory on the host.
+		Path string `json:"path"`
+	}
+
+	// Adapts a Secret into a volume. The contents of the target Secret’s Data field will be presented in a volume as files
+	// using the keys in the Data field as the file names.
+	// Secret volumes support ownership management and SELinux relabeling.
 	SecretVolumeSource struct {
+		// Name of the secret in the pod’s namespace to use.
 		SecretName string `json:"secretName,omitempty"`
+		// If unspecified, each key-value pair in the Data field of the referenced Secret will be projected into the volume
+		// as a file whose name is the key and content is the value.
+		// If specified, the listed keys will be projected into the specified paths, and unlisted keys will not be present.
+		// If a key is specified which is not present in the Secret, the volume setup will error.
+		// Paths must be relative and may not contain the .. path or start with ...
+		Items []KeyToPath `json:"items,omitempty"`
+		// Optional: mode bits to use on created files by default. Must be a value between 0 and 0777.
+		// Defaults to 0644. Directories within the path are not affected by this setting.
+		// This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.
+		DefaultMode int32 `json:"defaultMode,omitempty"`
+	}
+
+	// Maps a string key to a path within a volume.
+	KeyToPath struct {
+		// The key to project.
+		Key string `json:"key"`
+		// The relative path of the file to map the key to. May not be an absolute path. May not contain the path element ... May not start with the string ...
+		Path string `json:"path"`
+		// Optional: mode bits to use on this file, must be a value between 0 and 0777.
+		// If not specified, the volume defaultMode will be used. This might be in conflict with other options
+		// that affect the file mode, like fsGroup, and the result can be other mode bits set.
+		Mode int32 `json:"mode,omitempty"`
 	}
 
 	Container struct {
