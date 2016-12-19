@@ -1,5 +1,7 @@
 package client
 
+import "github.com/YakLabs/k8s-client/intstr"
+
 type (
 	// IngressInterface has methods to work with Ingress resources.
 	IngressInterface interface {
@@ -53,7 +55,7 @@ type (
 		ServiceName string `json:"serviceName"`
 
 		// Specifies the port of the referenced service.
-		ServicePort string `json:"servicePort"`
+		ServicePort intstr.IntOrString `json:"servicePort"`
 	}
 
 	// IngressTLS describes the transport layer security associated with an Ingress.
