@@ -54,8 +54,8 @@ type (
 	Pod struct {
 		TypeMeta   `json:",inline"`
 		ObjectMeta `json:"metadata,omitempty"`
-		Spec       PodSpec   `json:"spec,omitempty"`
-		Status     PodStatus `json:"status,omitempty"`
+		Spec       *PodSpec   `json:"spec,omitempty"`
+		Status     *PodStatus `json:"status,omitempty"`
 	}
 
 	PodList struct {
@@ -123,23 +123,23 @@ type (
 	}
 
 	Container struct {
-		Name                   string               `json:"name"`
-		Image                  string               `json:"image"`
-		Command                []string             `json:"command,omitempty"`
-		Args                   []string             `json:"args,omitempty"`
-		WorkingDir             string               `json:"workingDir,omitempty"`
-		Ports                  []ContainerPort      `json:"ports,omitempty"`
-		Env                    []EnvVar             `json:"env,omitempty"`
-		Resources              ResourceRequirements `json:"resources,omitempty"`
-		VolumeMounts           []VolumeMount        `json:"volumeMounts,omitempty"`
-		LivenessProbe          *Probe               `json:"livenessProbe,omitempty"`
-		ReadinessProbe         *Probe               `json:"readinessProbe,omitempty"`
-		Lifecycle              *Lifecycle           `json:"lifecycle,omitempty"`
-		TerminationMessagePath string               `json:"terminationMessagePath,omitempty"`
-		ImagePullPolicy        PullPolicy           `json:"imagePullPolicy"`
-		Stdin                  bool                 `json:"stdin,omitempty"`
-		StdinOnce              bool                 `json:"stdinOnce,omitempty"`
-		TTY                    bool                 `json:"tty,omitempty"`
+		Name                   string                `json:"name"`
+		Image                  string                `json:"image"`
+		Command                []string              `json:"command,omitempty"`
+		Args                   []string              `json:"args,omitempty"`
+		WorkingDir             string                `json:"workingDir,omitempty"`
+		Ports                  []ContainerPort       `json:"ports,omitempty"`
+		Env                    []EnvVar              `json:"env,omitempty"`
+		Resources              *ResourceRequirements `json:"resources,omitempty"`
+		VolumeMounts           []VolumeMount         `json:"volumeMounts,omitempty"`
+		LivenessProbe          *Probe                `json:"livenessProbe,omitempty"`
+		ReadinessProbe         *Probe                `json:"readinessProbe,omitempty"`
+		Lifecycle              *Lifecycle            `json:"lifecycle,omitempty"`
+		TerminationMessagePath string                `json:"terminationMessagePath,omitempty"`
+		ImagePullPolicy        PullPolicy            `json:"imagePullPolicy"`
+		Stdin                  bool                  `json:"stdin,omitempty"`
+		StdinOnce              bool                  `json:"stdinOnce,omitempty"`
+		TTY                    bool                  `json:"tty,omitempty"`
 	}
 
 	ContainerPort struct {
@@ -274,9 +274,9 @@ type (
 	// ContainerStatus is the status of a single container within a pod.
 	ContainerStatus struct {
 		// Each container in a pod must have a unique name.
-		Name                 string         `json:"name"`
-		State                ContainerState `json:"state,omitempty"`
-		LastTerminationState ContainerState `json:"lastState,omitempty"`
+		Name                 string          `json:"name"`
+		State                *ContainerState `json:"state,omitempty"`
+		LastTerminationState *ContainerState `json:"lastState,omitempty"`
 		// Ready specifies whether the container has passed its readiness check.
 		Ready bool `json:"ready"`
 		// Note that this is calculated from dead containers.  But those containers are subject to

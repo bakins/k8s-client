@@ -35,16 +35,8 @@ type (
 // NewSecret creates a new Secret struct
 func NewSecret(namespace, name string) *Secret {
 	return &Secret{
-		TypeMeta: TypeMeta{
-			Kind:       "Secret",
-			APIVersion: "v1",
-		},
-		ObjectMeta: ObjectMeta{
-			Namespace:   namespace,
-			Name:        name,
-			Labels:      make(map[string]string),
-			Annotations: make(map[string]string),
-		},
-		Data: make(map[string][]byte),
+		TypeMeta:   NewTypeMeta("Secret", "v1"),
+		ObjectMeta: NewObjectMeta(namespace, name),
+		Data:       make(map[string][]byte),
 	}
 }

@@ -54,3 +54,12 @@ type (
 		Items []DaemonSet `json:"items"`
 	}
 )
+
+// NewDaemonSet creates a new DaemonSet struct
+func NewDaemonSet(namespace, name string) *DaemonSet {
+	return &DaemonSet{
+		TypeMeta:   NewTypeMeta("DaemonSet", "extensions/v1beta1"),
+		ObjectMeta: NewObjectMeta(namespace, name),
+		Spec:       &DaemonSetSpec{},
+	}
+}

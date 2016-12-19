@@ -104,3 +104,21 @@ func (o *ObjectMeta) GetLabels() map[string]string {
 func (o *ObjectMeta) SetLabels(labels map[string]string) {
 	o.Labels = labels
 }
+
+// NewTypeMeta creates a new TypeMeta and initializes the given kind & apiVersion
+func NewTypeMeta(kind, apiVersion string) TypeMeta {
+	return TypeMeta{
+		Kind:       kind,
+		APIVersion: apiVersion,
+	}
+}
+
+// NewObjectMeta creates a new ObjectMeta and initializes the given namespace, name & internal maps.
+func NewObjectMeta(namespace, name string) ObjectMeta {
+	return ObjectMeta{
+		Namespace:   namespace,
+		Name:        name,
+		Labels:      make(map[string]string),
+		Annotations: make(map[string]string),
+	}
+}

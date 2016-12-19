@@ -116,15 +116,8 @@ type (
 // NewIngress creates a new Ingress struct
 func NewIngress(namespace, name string) *Ingress {
 	return &Ingress{
-		TypeMeta: TypeMeta{
-			Kind:       "Ingress",
-			APIVersion: "extensions/v1beta1",
-		},
-		ObjectMeta: ObjectMeta{
-			Namespace:   namespace,
-			Name:        name,
-			Labels:      make(map[string]string),
-			Annotations: make(map[string]string),
-		},
+		TypeMeta:   NewTypeMeta("Ingress", "extensions/v1beta1"),
+		ObjectMeta: NewObjectMeta(namespace, name),
+		Spec:       &IngressSpec{},
 	}
 }

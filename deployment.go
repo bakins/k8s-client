@@ -25,12 +25,13 @@ type (
 		ObjectMeta `json:"metadata,omitempty"`
 
 		// Specification of the desired behavior of the Deployment.
-		Spec DeploymentSpec `json:"spec,omitempty"`
+		Spec *DeploymentSpec `json:"spec,omitempty"`
 
 		// Most recently observed status of the Deployment.
-		Status DeploymentStatus `json:"status,omitempty"`
+		Status *DeploymentStatus `json:"status,omitempty"`
 	}
 
+	// DeploymentSpec is the specification of the desired behavior of the Deployment.
 	DeploymentSpec struct {
 		// Number of desired pods. This is a pointer to distinguish between explicit
 		// zero and not specified. Defaults to 1.
@@ -44,7 +45,7 @@ type (
 		Template PodTemplateSpec `json:"template"`
 
 		// The deployment strategy to use to replace existing pods with new ones.
-		Strategy DeploymentStrategy `json:"strategy,omitempty"`
+		Strategy *DeploymentStrategy `json:"strategy,omitempty"`
 
 		// Minimum number of seconds for which a newly created pod should be ready
 		// without any of its container crashing, for it to be considered available.
@@ -114,9 +115,10 @@ type (
 		ObjectMeta `json:"metadata,omitempty"`
 
 		// Spec defines the behavior of a pod.
-		Spec PodSpec `json:"spec,omitempty"`
+		Spec *PodSpec `json:"spec,omitempty"`
 	}
 
+	// DeploymentStatus is the most recently observed status of the Deployment.
 	DeploymentStatus struct {
 		// The generation observed by the deployment controller.
 		ObservedGeneration int64 `json:"observedGeneration,omitempty"`
@@ -142,3 +144,20 @@ type (
 		Items []Deployment `json:"items"`
 	}
 )
+
+// NewDeployment creates a new Deployment struct
+func NewDeployment(namespace, name string) *Deployment {
+	return &Deployment{
+		TypeMeta:   NewTypeMeta("Deployment", "extensions/v1beta1"),
+		ObjectMeta: NewObjectMeta(namespace, name),
+		Spec:       &DeploymentSpec{},
+	}
+}
+
+// NewPodTemplateSpec creates a new PodTemplateSpec struct
+func NewPodTemplateSpec(namespace, name string) *PodTemplateSpec {
+	return &PodTemplateSpec{
+		ObjectMeta: NewObjectMeta(namespace, name),
+		Spec:       &PodSpec{},
+	}
+}

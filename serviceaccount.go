@@ -31,3 +31,11 @@ type (
 		Items    []ServiceAccount `json:"items"`
 	}
 )
+
+// NewServiceAccount creates a new ServiceAccount struct
+func NewServiceAccount(namespace, name string) *ServiceAccount {
+	return &ServiceAccount{
+		TypeMeta:   NewTypeMeta("ServiceAccount", "v1"),
+		ObjectMeta: NewObjectMeta(namespace, name),
+	}
+}
