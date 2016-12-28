@@ -63,8 +63,8 @@ func (c *Client) Create${TYPE}(namespace string, item *k8s.${TYPE}) (*k8s.${TYPE
 	return &out, nil
 }
 
-// List${TYPE}s lists all ${TYPE}s in a namespace
-func (c *Client) List${TYPE}s(namespace string, opts *k8s.ListOptions) (*k8s.${TYPE}List, error) {
+// List${TYPE}${APIPATHEXT} lists all ${TYPE}s in a namespace
+func (c *Client) List${TYPE}${APIPATHEXT}(namespace string, opts *k8s.ListOptions) (*k8s.${TYPE}List, error) {
 	var out k8s.${TYPE}List
 	_, err := c.do("GET", ${APIPATH}GeneratePath(namespace, "") + "?"+listOptionsQuery(opts), nil, &out)
 	if err != nil {
