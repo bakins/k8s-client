@@ -24,10 +24,10 @@ type (
 		ObjectMeta `json:"metadata,omitempty"`
 
 		// behaviour of autoscaler. More info: http://releases.k8s.io/release-1.3/docs/devel/api-conventions.md#spec-and-status.
-		Spec HorizontalPodAutoscalerSpec `json:"spec,omitempty"`
+		Spec *HorizontalPodAutoscalerSpec `json:"spec,omitempty"`
 
 		// current information about the autoscaler.
-		Status HorizontalPodAutoscalerStatus `json:"status,omitempty"`
+		Status *HorizontalPodAutoscalerStatus `json:"status,omitempty"`
 	}
 
 	// current status of a horizontal pod autoscaler
@@ -75,18 +75,11 @@ type (
 	}
 )
 
-// NewHorizontalPodAutoscalere creates a new HorizontalPodAutoscaler struct
+// NewHorizontalPodAutoscaler creates a new HorizontalPodAutoscaler struct
 func NewHorizontalPodAutoscaler(namespace, name string) *HorizontalPodAutoscaler {
 	return &HorizontalPodAutoscaler{
-		TypeMeta: TypeMeta{
-			Kind:       "HorizontalPodAutoscaler",
-			APIVersion: "autoscaling",
-		},
-		ObjectMeta: ObjectMeta{
-			Namespace:   namespace,
-			Name:        name,
-			Labels:      make(map[string]string),
-			Annotations: make(map[string]string),
-		},
+		TypeMeta:   NewTypeMeta("HorizontalPodAutoscaler", "autoscaling"),
+		ObjectMeta: NewObjectMeta(namespace, name),
+		Spec:       &HorizontalPodAutoscalerSpec{},
 	}
 }

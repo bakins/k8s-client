@@ -24,3 +24,12 @@ type (
 		Items []ConfigMap `json:"items"`
 	}
 )
+
+// NewConfigMap creates a new ConfigMap struct
+func NewConfigMap(namespace, name string) *ConfigMap {
+	return &ConfigMap{
+		TypeMeta:   NewTypeMeta("ConfigMap", "v1"),
+		ObjectMeta: NewObjectMeta(namespace, name),
+		Data:       make(map[string][]byte),
+	}
+}

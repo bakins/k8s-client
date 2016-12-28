@@ -39,10 +39,10 @@ type (
 		ObjectMeta `json:"metadata,omitempty"`
 
 		// Spec defines the behavior of a service
-		Spec ServiceSpec `json:"spec,omitempty"`
+		Spec *ServiceSpec `json:"spec,omitempty"`
 
 		// Status represents the current status of a service.
-		Status ServiceStatus `json:"status,omitempty"`
+		Status *ServiceStatus `json:"status,omitempty"`
 	}
 
 	// ServiceList holds a list of services.
@@ -57,7 +57,7 @@ type (
 	ServiceStatus struct {
 		// LoadBalancer contains the current status of the load-balancer,
 		// if one is present.
-		LoadBalancer LoadBalancerStatus `json:"loadBalancer,omitempty"`
+		LoadBalancer *LoadBalancerStatus `json:"loadBalancer,omitempty"`
 	}
 
 	// LoadBalancerStatus represents the status of a load-balancer
@@ -154,17 +154,9 @@ type (
 // NewService creates a new service struct
 func NewService(namespace, name string) *Service {
 	return &Service{
-		TypeMeta: TypeMeta{
-			Kind:       "Service",
-			APIVersion: "v1",
-		},
-		ObjectMeta: ObjectMeta{
-			Namespace:   namespace,
-			Name:        name,
-			Labels:      make(map[string]string),
-			Annotations: make(map[string]string),
-		},
-		Spec: ServiceSpec{
+		TypeMeta:   NewTypeMeta("Service", "v1"),
+		ObjectMeta: NewObjectMeta(namespace, name),
+		Spec: &ServiceSpec{
 			Ports:    make([]ServicePort, 0),
 			Selector: make(map[string]string),
 		},

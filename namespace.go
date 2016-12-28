@@ -22,8 +22,8 @@ type (
 	Namespace struct {
 		TypeMeta   `json:",inline"`
 		ObjectMeta `json:"metadata,omitempty"`
-		Spec       NamespaceSpec   `json:"spec,omitempty"`
-		Status     NamespaceStatus `json:"status,omitempty"`
+		Spec       *NamespaceSpec   `json:"spec,omitempty"`
+		Status     *NamespaceStatus `json:"status,omitempty"`
 	}
 
 	NamespaceList struct {
@@ -37,16 +37,8 @@ type (
 // NewNamespace creates a new namespace struct
 func NewNamespace(name string) *Namespace {
 	return &Namespace{
-		TypeMeta: TypeMeta{
-			Kind:       "Namespace",
-			APIVersion: "v1",
-		},
-		ObjectMeta: ObjectMeta{
-			Namespace:   name,
-			Name:        name,
-			Labels:      make(map[string]string),
-			Annotations: make(map[string]string),
-		},
+		TypeMeta:   NewTypeMeta("Namespace", "v1"),
+		ObjectMeta: NewObjectMeta(name, name),
+		Spec:       &NamespaceSpec{},
 	}
-
 }

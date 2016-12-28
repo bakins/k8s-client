@@ -23,11 +23,11 @@ type (
 		ObjectMeta `json:"metadata,omitempty"`
 
 		// Spec defines the desired behavior of this ReplicaSet.
-		Spec ReplicaSetSpec `json:"spec,omitempty"`
+		Spec *ReplicaSetSpec `json:"spec,omitempty"`
 
 		// Status is the current status of this ReplicaSet. This data may be
 		// out of date by some window of time.
-		Status ReplicaSetStatus `json:"status,omitempty"`
+		Status *ReplicaSetStatus `json:"status,omitempty"`
 	}
 
 	// ReplicaSetStatus represents the current status of a ReplicaSet.
@@ -55,29 +55,17 @@ type (
 
 		// Template is the object that describes the pod that will be created if
 		// insufficient replicas are detected.
-		Template PodTemplateSpec `json:"template,omitempty"`
+		Template *PodTemplateSpec `json:"template,omitempty"`
 	}
 )
 
-// NewService creates a new ReplicaSet struct
+// NewReplicaSet creates a new ReplicaSet struct
 func NewReplicaSet(namespace, name string) *ReplicaSet {
 	return &ReplicaSet{
-		TypeMeta: TypeMeta{
-			Kind:       "ReplicaSet",
-			APIVersion: "extensions/v1beta1",
-		},
-		ObjectMeta: ObjectMeta{
-			Namespace:   namespace,
-			Name:        name,
-			Labels:      make(map[string]string),
-			Annotations: make(map[string]string),
-		},
-		Spec: ReplicaSetSpec{
-			Template: PodTemplateSpec{
-				ObjectMeta: ObjectMeta{
-					Labels: make(map[string]string),
-				},
-			},
+		TypeMeta:   NewTypeMeta("ReplicaSet", "extensions/v1beta1"),
+		ObjectMeta: NewObjectMeta(namespace, name),
+		Spec: &ReplicaSetSpec{
+			Template: NewPodTemplateSpec("", ""),
 		},
 	}
 }
