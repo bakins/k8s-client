@@ -6,6 +6,7 @@ type (
 		ConfigMapInterface
 		DeploymentInterface
 		HorizontalPodAutoscalerInterface
+		IngressInterface
 		NamespaceInterface
 		NodeInterface
 		PodInterface
