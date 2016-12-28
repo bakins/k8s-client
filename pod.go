@@ -64,17 +64,54 @@ type (
 		Items    []Pod `json:"items"`
 	}
 
+	// PodSpec is a description of a pod.
 	PodSpec struct {
-		Volumes                       []Volume               `json:"volumes"`
-		Containers                    []Container            `json:"containers"`
-		RestartPolicy                 RestartPolicy          `json:"restartPolicy,omitempty"`
-		TerminationGracePeriodSeconds *int64                 `json:"terminationGracePeriodSeconds,omitempty"`
-		ActiveDeadlineSeconds         *int64                 `json:"activeDeadlineSeconds,omitempty"`
-		DNSPolicy                     DNSPolicy              `json:"dnsPolicy,omitempty"`
-		NodeSelector                  map[string]string      `json:"nodeSelector,omitempty"`
-		ServiceAccountName            string                 `json:"serviceAccountName"`
-		NodeName                      string                 `json:"nodeName,omitempty"`
-		ImagePullSecrets              []LocalObjectReference `json:"imagePullSecrets,omitempty"`
+		// List of volumes that can be mounted by containers belonging to the pod.
+		Volumes []Volume `json:"volumes,omitempty"`
+		// List of containers belonging to the pod. Containers cannot currently be added or removed.
+		// There must be at least one container in a Pod. Cannot be updated.
+		Containers []Container `json:"containers"`
+		// Restart policy for all containers within the pod. One of Always, OnFailure, Never. Default to Always.
+		RestartPolicy RestartPolicy `json:"restartPolicy,omitempty"`
+		// Optional duration in seconds the pod needs to terminate gracefully. May be decreased in delete request.
+		// Value must be non-negative integer. The value zero indicates delete immediately. If this value is nil,
+		// the default grace period will be used instead.
+		//  The grace period is the duration in seconds after the processes running in the pod are sent a termination
+		// signal and the time when the processes are forcibly halted with a kill signal.
+		// Set this value longer than the expected cleanup time for your process. Defaults to 30 seconds.
+		TerminationGracePeriodSeconds *int64 `json:"terminationGracePeriodSeconds,omitempty"`
+		// Optional duration in seconds the pod may be active on the node relative to StartTime before the system will
+		// actively try to mark it failed and kill associated containers. Value must be a positive integer.
+		ActiveDeadlineSeconds *int64 `json:"activeDeadlineSeconds,omitempty"`
+		// Set DNS policy for containers within the pod. One of ClusterFirst or Default. Defaults to "ClusterFirst".
+		DNSPolicy DNSPolicy `json:"dnsPolicy,omitempty"`
+		// NodeSelector is a selector which must be true for the pod to fit on a node.
+		// Selector which must match a node’s labels for the pod to be scheduled on that node.
+		NodeSelector map[string]string `json:"nodeSelector,omitempty"`
+		// ServiceAccountName is the name of the ServiceAccount to use to run this pod.
+		ServiceAccountName string `json:"serviceAccountName,omitempty"`
+		// NodeName is a request to schedule this pod onto a specific node.
+		// If it is non-empty, the scheduler simply schedules this pod onto that node, assuming that it fits resource requirements.
+		NodeName string `json:"nodeName,omitempty"`
+		// Host networking requested for this pod. Use the host’s network namespace.
+		// If this option is set, the ports that will be used must be specified. Default to false.
+		HostNetwork bool `json:"hostNetwork,omitempty"`
+		// Use the host’s pid namespace. Optional: Default to false.
+		HostPID bool `json:"hostPID,omitempty"`
+		// Use the host’s ipc namespace. Optional: Default to false.
+		HostIPC bool `json:"hostIPC,omitempty"`
+		// SecurityContext holds pod-level security attributes and common container settings.
+		// Optional: Defaults to empty. See type description for default values of each field.
+		SecurityContext *PodSecurityContext `json:"securityContext,omitempty"`
+		// ImagePullSecrets is an optional list of references to secrets in the same namespace to use for pulling any of the images used by this PodSpec.
+		// If specified, these secrets will be passed to individual puller implementations for them to use.
+		// For example, in the case of docker, only DockerConfig type secrets are honored.
+		ImagePullSecrets []LocalObjectReference `json:"imagePullSecrets,omitempty"`
+		// Specifies the hostname of the Pod If not specified, the pod’s hostname will be set to a system-defined value.
+		Hostname string `json:"hostname,omitempty"`
+		// If specified, the fully qualified Pod hostname will be "<hostname>.<subdomain>.<pod namespace>.svc.<cluster domain>".
+		// If not specified, the pod will not have a domainname at all.
+		Subdomain string `json:"subdomain,omitempty"`
 	}
 
 	PodStatus struct {
@@ -95,6 +132,46 @@ type (
 		LastTransitionTime Time             `json:"lastTransitionTime,omitempty"`
 		Reason             string           `json:"reason,omitempty"`
 		Message            string           `json:"message,omitempty"`
+	}
+
+	// PodSecurityContext holds pod-level security attributes and common container settings.
+	// Some fields are also present in container.securityContext.
+	// Field values of container.securityContext take precedence over field values of PodSecurityContext.
+	PodSecurityContext struct {
+		// The SELinux context to be applied to all containers. If unspecified, the container runtime will
+		// allocate a random SELinux context for each container. May also be set in SecurityContext.
+		// If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence for that container.
+		SELinuxOptions *SELinuxOptions `json:"seLinuxOptions,omitempty"`
+		// The UID to run the entrypoint of the container process.
+		// Defaults to user specified in image metadata if unspecified. May also be set in SecurityContext.
+		// If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence for that container.
+		RunAsUser int64 `json:"runAsUser,omitempty"`
+		// Indicates that the container must run as a non-root user. If true, the Kubelet will validate the image at runtime to ensure
+		// that it does not run as UID 0 (root) and fail to start the container if it does.
+		// If unset or false, no such validation will be performed. May also be set in SecurityContext.
+		// If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence.
+		RunAsNonRoot bool `json:"runAsNonRoot,omitempty"`
+		// A list of groups applied to the first process run in each container, in addition to the container’s primary GID.
+		// If unspecified, no groups will be added to any container.
+		SupplementalGroups []int32 `json:"supplementalGroups,omitempty"`
+		// A special supplemental group that applies to all containers in a pod.
+		// Some volume types allow the Kubelet to change the ownership of that volume to be owned by the pod:
+		// 1. The owning GID will be the FSGroup
+		// 2. The setgid bit is set (new files created in the volume will be owned by FSGroup)
+		// 3. The permission bits are OR’d with rw-rw
+		FSGroup int64 `json:"fsGroup,omitempty"`
+	}
+
+	// SELinuxOptions are the labels to be applied to the container
+	SELinuxOptions struct {
+		// User is a SELinux user label that applies to the container.
+		User string `json:"user,omitempty"`
+		// Role is a SELinux role label that applies to the container.
+		Role string `json:"role,omitempty"`
+		// Type is a SELinux type label that applies to the container.
+		Type string `json:"type,omitempty"`
+		// Level is SELinux level label that applies to the container.
+		Level string `json:"level,omitempty"`
 	}
 
 	PodConditionType string
