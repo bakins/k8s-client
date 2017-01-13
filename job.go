@@ -5,7 +5,7 @@ type (
 	JobInterface interface {
 		CreateJob(namespace string, item *Job) (*Job, error)
 		GetJob(namespace, name string) (result *Job, err error)
-		ListJobs(namespace string, opts *ListOptions) (*Job, error)
+		ListJobs(namespace string, opts *ListOptions) (*JobList, error)
 		DeleteJob(namespace, name string) error
 		UpdateJob(namespace string, item *Job) (*Job, error)
 	}
