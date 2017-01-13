@@ -8,6 +8,7 @@ type (
 		DeploymentInterface
 		HorizontalPodAutoscalerInterface
 		IngressInterface
+		JobInterface
 		NamespaceInterface
 		NodeInterface
 		PodInterface

@@ -3,11 +3,11 @@ package client
 type (
 	// JobInterface has methods to work with Job resources.
 	JobInterface interface {
-		CreateDaemonSet(namespace string, item *DaemonSet) (*DaemonSet, error)
-		GetDaemonSet(namespace, name string) (result *DaemonSet, err error)
-		ListDaemonSets(namespace string, opts *ListOptions) (*DaemonSetList, error)
-		DeleteDaemonSet(namespace, name string) error
-		UpdateDaemonSet(namespace string, item *DaemonSet) (*DaemonSet, error)
+		CreateJob(namespace string, item *Job) (*Job, error)
+		GetJob(namespace, name string) (result *Job, err error)
+		ListJobs(namespace string, opts *ListOptions) (*Job, error)
+		DeleteJob(namespace, name string) error
+		UpdateJob(namespace string, item *Job) (*Job, error)
 	}
 
 	// Job represents the configuration of a single job.
