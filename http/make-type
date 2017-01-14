@@ -14,6 +14,9 @@ case ${APIVERSION} in
     "v1")
         API=/api/v1
         ;;
+    "batch/v1")
+        API=/apis/batch/v1
+        ;;
     "autoscaling/v1")
         API=/apis/autoscaling/v1
         ;;

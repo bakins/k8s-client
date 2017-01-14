@@ -23,6 +23,7 @@ import (
 //go:generate ./make-type DaemonSet extensions/v1beta1
 //go:generate ./make-type Deployment extensions/v1beta1
 //go:generate ./make-type Ingress extensions/v1beta1 es
+//go:generate ./make-type Job batch/v1
 //go:generate ./make-type Pod v1
 //go:generate ./make-type ConfigMap v1
 //go:generate ./make-type ReplicaSet extensions/v1beta1
