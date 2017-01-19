@@ -6,6 +6,7 @@ type (
 		ConfigMapInterface
 		DaemonSetInterface
 		DeploymentInterface
+		EndpointsInterface
 		HorizontalPodAutoscalerInterface
 		IngressInterface
 		JobInterface
