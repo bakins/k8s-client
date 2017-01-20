@@ -5,7 +5,40 @@ import (
 	"github.com/pkg/errors"
 )
 
+type (
+	watchEventEndpoints struct {
+		raw    k8s.WatchEvent
+		object *k8s.Endpoints
+	}
+)
+
+func (w *watchEventEndpoints) Type() k8s.WatchEventType {
+	return w.raw.Type
+}
+
+func (w *watchEventEndpoints) Object() (*k8s.Endpoints, error) {
+	if w.object != nil {
+		return w.object, nil
+	}
+	if w.raw.Type == k8s.WatchEventTypeError {
+		var status k8s.Status
+		if err := w.raw.UnmarshalObject(&status); err != nil {
+			return nil, errors.Wrap(err, "failed to decode Status")
+		}
+		return nil, &status
+	}
+	var object k8s.Endpoints
+	if err := w.raw.UnmarshalObject(&object); err != nil {
+		return nil, errors.Wrap(err, "failed to decode Endpoints")
+	}
+	w.object = &object
+	return &object, nil
+}
+
 func endpointsGeneratePath(namespace, name string) string {
+	if namespace == "" && name == "" {
+		return "/api/v1/endpoints"
+	}
 	if name == "" {
 		return "/api/v1/namespaces/" + namespace + "/endpoints"
 	}
@@ -39,11 +72,30 @@ func (c *Client) CreateEndpoints(namespace string, item *k8s.Endpoints) (*k8s.En
 // ListEndpoints lists all Endpointss in a namespace
 func (c *Client) ListEndpoints(namespace string, opts *k8s.ListOptions) (*k8s.EndpointsList, error) {
 	var out k8s.EndpointsList
-	_, err := c.do("GET", endpointsGeneratePath(namespace, "")+"?"+listOptionsQuery(opts), nil, &out)
+	_, err := c.do("GET", endpointsGeneratePath(namespace, "")+"?"+listOptionsQuery(opts, nil), nil, &out)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to list Endpointss")
 	}
 	return &out, nil
+}
+
+// WatchEndpoints watches all Endpoints changes in a namespace
+func (c *Client) WatchEndpoints(namespace string, opts *k8s.WatchOptions, events chan k8s.EndpointsWatchEvent) error {
+	if events == nil {
+		return errors.New("events must not be nil")
+	}
+	rawEvents := make(chan k8s.WatchEvent)
+	go func() {
+		for rawEvent := range rawEvents {
+			events <- &watchEventEndpoints{raw: rawEvent}
+		}
+		close(events)
+	}()
+	_, err := c.doWatch("GET", endpointsGeneratePath(namespace, "")+"?"+watchOptionsQuery(opts), nil, rawEvents)
+	if err != nil {
+		return errors.Wrap(err, "failed to watch Endpointss")
+	}
+	return nil
 }
 
 // DeleteEndpoints deletes a single Endpoints. It will error if the Endpoints does not exist.

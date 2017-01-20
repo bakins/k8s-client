@@ -5,7 +5,40 @@ import (
 	"github.com/pkg/errors"
 )
 
+type (
+	watchEventHorizontalPodAutoscaler struct {
+		raw    k8s.WatchEvent
+		object *k8s.HorizontalPodAutoscaler
+	}
+)
+
+func (w *watchEventHorizontalPodAutoscaler) Type() k8s.WatchEventType {
+	return w.raw.Type
+}
+
+func (w *watchEventHorizontalPodAutoscaler) Object() (*k8s.HorizontalPodAutoscaler, error) {
+	if w.object != nil {
+		return w.object, nil
+	}
+	if w.raw.Type == k8s.WatchEventTypeError {
+		var status k8s.Status
+		if err := w.raw.UnmarshalObject(&status); err != nil {
+			return nil, errors.Wrap(err, "failed to decode Status")
+		}
+		return nil, &status
+	}
+	var object k8s.HorizontalPodAutoscaler
+	if err := w.raw.UnmarshalObject(&object); err != nil {
+		return nil, errors.Wrap(err, "failed to decode HorizontalPodAutoscaler")
+	}
+	w.object = &object
+	return &object, nil
+}
+
 func horizontalpodautoscalerGeneratePath(namespace, name string) string {
+	if namespace == "" && name == "" {
+		return "/apis/autoscaling/v1/horizontalpodautoscalers"
+	}
 	if name == "" {
 		return "/apis/autoscaling/v1/namespaces/" + namespace + "/horizontalpodautoscalers"
 	}
@@ -39,11 +72,30 @@ func (c *Client) CreateHorizontalPodAutoscaler(namespace string, item *k8s.Horiz
 // ListHorizontalPodAutoscalers lists all HorizontalPodAutoscalers in a namespace
 func (c *Client) ListHorizontalPodAutoscalers(namespace string, opts *k8s.ListOptions) (*k8s.HorizontalPodAutoscalerList, error) {
 	var out k8s.HorizontalPodAutoscalerList
-	_, err := c.do("GET", horizontalpodautoscalerGeneratePath(namespace, "")+"?"+listOptionsQuery(opts), nil, &out)
+	_, err := c.do("GET", horizontalpodautoscalerGeneratePath(namespace, "")+"?"+listOptionsQuery(opts, nil), nil, &out)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to list HorizontalPodAutoscalers")
 	}
 	return &out, nil
+}
+
+// WatchHorizontalPodAutoscalers watches all HorizontalPodAutoscaler changes in a namespace
+func (c *Client) WatchHorizontalPodAutoscalers(namespace string, opts *k8s.WatchOptions, events chan k8s.HorizontalPodAutoscalerWatchEvent) error {
+	if events == nil {
+		return errors.New("events must not be nil")
+	}
+	rawEvents := make(chan k8s.WatchEvent)
+	go func() {
+		for rawEvent := range rawEvents {
+			events <- &watchEventHorizontalPodAutoscaler{raw: rawEvent}
+		}
+		close(events)
+	}()
+	_, err := c.doWatch("GET", horizontalpodautoscalerGeneratePath(namespace, "")+"?"+watchOptionsQuery(opts), nil, rawEvents)
+	if err != nil {
+		return errors.Wrap(err, "failed to watch HorizontalPodAutoscalers")
+	}
+	return nil
 }
 
 // DeleteHorizontalPodAutoscaler deletes a single HorizontalPodAutoscaler. It will error if the HorizontalPodAutoscaler does not exist.
