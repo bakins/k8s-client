@@ -6,8 +6,14 @@ type (
 		CreateReplicaSet(namespace string, item *ReplicaSet) (*ReplicaSet, error)
 		GetReplicaSet(namespace, name string) (result *ReplicaSet, err error)
 		ListReplicaSets(namespace string, opts *ListOptions) (*ReplicaSetList, error)
+		WatchReplicaSets(namespace string, opts *WatchOptions, events chan ReplicaSetWatchEvent) error
 		DeleteReplicaSet(namespace, name string) error
 		UpdateReplicaSet(namespace string, item *ReplicaSet) (*ReplicaSet, error)
+	}
+
+	ReplicaSetWatchEvent interface {
+		Type() WatchEventType
+		Object() (*ReplicaSet, error)
 	}
 
 	// ReplicaSetList is a collection of ReplicaSets.

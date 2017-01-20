@@ -5,8 +5,14 @@ type (
 		CreateConfigMap(namespace string, item *ConfigMap) (*ConfigMap, error)
 		GetConfigMap(namespace, name string) (result *ConfigMap, err error)
 		ListConfigMaps(namespace string, opts *ListOptions) (*ConfigMapList, error)
+		WatchConfigMaps(namespace string, opts *WatchOptions, events chan ConfigMapWatchEvent) error
 		DeleteConfigMap(namespace, name string) error
 		UpdateConfigMap(namespace string, item *ConfigMap) (*ConfigMap, error)
+	}
+
+	ConfigMapWatchEvent interface {
+		Type() WatchEventType
+		Object() (*ConfigMap, error)
 	}
 
 	ConfigMapType string

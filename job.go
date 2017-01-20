@@ -6,8 +6,14 @@ type (
 		CreateJob(namespace string, item *Job) (*Job, error)
 		GetJob(namespace, name string) (result *Job, err error)
 		ListJobs(namespace string, opts *ListOptions) (*JobList, error)
+		WatchJobs(namespace string, opts *WatchOptions, events chan JobWatchEvent) error
 		DeleteJob(namespace, name string) error
 		UpdateJob(namespace string, item *Job) (*Job, error)
+	}
+
+	JobWatchEvent interface {
+		Type() WatchEventType
+		Object() (*Job, error)
 	}
 
 	// Job represents the configuration of a single job.

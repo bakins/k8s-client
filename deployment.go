@@ -16,8 +16,14 @@ type (
 		CreateDeployment(namespace string, item *Deployment) (*Deployment, error)
 		GetDeployment(namespace, name string) (result *Deployment, err error)
 		ListDeployments(namespace string, opts *ListOptions) (*DeploymentList, error)
+		WatchDeployments(namespace string, opts *WatchOptions, events chan DeploymentWatchEvent) error
 		DeleteDeployment(namespace, name string) error
 		UpdateDeployment(namespace string, item *Deployment) (*Deployment, error)
+	}
+
+	DeploymentWatchEvent interface {
+		Type() WatchEventType
+		Object() (*Deployment, error)
 	}
 
 	Deployment struct {

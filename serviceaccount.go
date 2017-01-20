@@ -6,8 +6,14 @@ type (
 		CreateServiceAccount(namespace string, item *ServiceAccount) (*ServiceAccount, error)
 		GetServiceAccount(namespace, name string) (result *ServiceAccount, err error)
 		ListServiceAccounts(namespace string, opts *ListOptions) (*ServiceAccountList, error)
+		WatchServiceAccounts(namespace string, opts *WatchOptions, events chan ServiceAccountWatchEvent) error
 		DeleteServiceAccount(namepsace, name string) error
 		UpdateServiceAccount(namespace string, item *ServiceAccount) (*ServiceAccount, error)
+	}
+
+	ServiceAccountWatchEvent interface {
+		Type() WatchEventType
+		Object() (*ServiceAccount, error)
 	}
 
 	// ServiceAccount binds together: * a name, understood by users, and perhaps by peripheral systems, for an identity * a principal that can be authenticated and authorized * a set of secrets
