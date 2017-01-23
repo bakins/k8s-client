@@ -34,8 +34,14 @@ type (
 		CreateService(namespace string, item *Service) (*Service, error)
 		GetService(namespace, name string) (result *Service, err error)
 		ListServices(namespace string, opts *ListOptions) (*ServiceList, error)
+		WatchServices(namespace string, opts *WatchOptions, events chan ServiceWatchEvent) error
 		DeleteService(namespace, name string) error
 		UpdateService(namespace string, item *Service) (*Service, error)
+	}
+
+	ServiceWatchEvent interface {
+		Type() WatchEventType
+		Object() (*Service, error)
 	}
 
 	// Service is a named abstraction of software service (for example, mysql) consisting of local port (for example 3306) that the proxy listens on, and the selector that determines which pods will answer requests sent through the proxy.

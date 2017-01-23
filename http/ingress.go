@@ -5,7 +5,40 @@ import (
 	"github.com/pkg/errors"
 )
 
+type (
+	watchEventIngress struct {
+		raw    k8s.WatchEvent
+		object *k8s.Ingress
+	}
+)
+
+func (w *watchEventIngress) Type() k8s.WatchEventType {
+	return w.raw.Type
+}
+
+func (w *watchEventIngress) Object() (*k8s.Ingress, error) {
+	if w.object != nil {
+		return w.object, nil
+	}
+	if w.raw.Type == k8s.WatchEventTypeError {
+		var status k8s.Status
+		if err := w.raw.UnmarshalObject(&status); err != nil {
+			return nil, errors.Wrap(err, "failed to decode Status")
+		}
+		return nil, &status
+	}
+	var object k8s.Ingress
+	if err := w.raw.UnmarshalObject(&object); err != nil {
+		return nil, errors.Wrap(err, "failed to decode Ingress")
+	}
+	w.object = &object
+	return &object, nil
+}
+
 func ingressGeneratePath(namespace, name string) string {
+	if namespace == "" && name == "" {
+		return "/apis/extensions/v1beta1/ingresses"
+	}
 	if name == "" {
 		return "/apis/extensions/v1beta1/namespaces/" + namespace + "/ingresses"
 	}
@@ -39,11 +72,30 @@ func (c *Client) CreateIngress(namespace string, item *k8s.Ingress) (*k8s.Ingres
 // ListIngresses lists all Ingresss in a namespace
 func (c *Client) ListIngresses(namespace string, opts *k8s.ListOptions) (*k8s.IngressList, error) {
 	var out k8s.IngressList
-	_, err := c.do("GET", ingressGeneratePath(namespace, "")+"?"+listOptionsQuery(opts), nil, &out)
+	_, err := c.do("GET", ingressGeneratePath(namespace, "")+"?"+listOptionsQuery(opts, nil), nil, &out)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to list Ingresss")
 	}
 	return &out, nil
+}
+
+// WatchIngresses watches all Ingress changes in a namespace
+func (c *Client) WatchIngresses(namespace string, opts *k8s.WatchOptions, events chan k8s.IngressWatchEvent) error {
+	if events == nil {
+		return errors.New("events must not be nil")
+	}
+	rawEvents := make(chan k8s.WatchEvent)
+	go func() {
+		for rawEvent := range rawEvents {
+			events <- &watchEventIngress{raw: rawEvent}
+		}
+		close(events)
+	}()
+	_, err := c.doWatch("GET", ingressGeneratePath(namespace, "")+"?"+watchOptionsQuery(opts), nil, rawEvents)
+	if err != nil {
+		return errors.Wrap(err, "failed to watch Ingresss")
+	}
+	return nil
 }
 
 // DeleteIngress deletes a single Ingress. It will error if the Ingress does not exist.

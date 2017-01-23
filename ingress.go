@@ -8,8 +8,14 @@ type (
 		CreateIngress(namespace string, item *Ingress) (*Ingress, error)
 		GetIngress(namespace, name string) (result *Ingress, err error)
 		ListIngresses(namespace string, opts *ListOptions) (*IngressList, error)
+		WatchIngresses(namespace string, opts *WatchOptions, events chan IngressWatchEvent) error
 		DeleteIngress(namespace, name string) error
 		UpdateIngress(namespace string, item *Ingress) (*Ingress, error)
+	}
+
+	IngressWatchEvent interface {
+		Type() WatchEventType
+		Object() (*Ingress, error)
 	}
 
 	// Ingress holds secret data of a certain type.

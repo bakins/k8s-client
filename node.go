@@ -5,8 +5,14 @@ type (
 		CreateNode(item *Node) (*Node, error)
 		GetNode(name string) (result *Node, err error)
 		ListNodes(opts *ListOptions) (*NodeList, error)
+		WatchNodes(opts *WatchOptions, events chan NodeWatchEvent) error
 		DeleteNode(name string) error
 		UpdateNode(item *Node) (*Node, error)
+	}
+
+	NodeWatchEvent interface {
+		Type() WatchEventType
+		Object() (*Node, error)
 	}
 
 	NodeSpec struct {

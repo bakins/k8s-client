@@ -5,8 +5,14 @@ type (
 		CreateHorizontalPodAutoscaler(namespace string, item *HorizontalPodAutoscaler) (*HorizontalPodAutoscaler, error)
 		GetHorizontalPodAutoscaler(namespace, name string) (result *HorizontalPodAutoscaler, err error)
 		ListHorizontalPodAutoscalers(namespace string, opts *ListOptions) (*HorizontalPodAutoscalerList, error)
+		WatchHorizontalPodAutoscalers(namespace string, opts *WatchOptions, events chan HorizontalPodAutoscalerWatchEvent) error
 		DeleteHorizontalPodAutoscaler(namespace, name string) error
 		UpdateHorizontalPodAutoscaler(namespace string, item *HorizontalPodAutoscaler) (*HorizontalPodAutoscaler, error)
+	}
+
+	HorizontalPodAutoscalerWatchEvent interface {
+		Type() WatchEventType
+		Object() (*HorizontalPodAutoscaler, error)
 	}
 
 	// list of horizontal pod autoscaler objects.

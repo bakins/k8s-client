@@ -37,8 +37,40 @@ import (
 	"github.com/pkg/errors"
 )
 
+type (
+	watchEvent${TYPE} struct {
+		raw k8s.WatchEvent 
+		object *k8s.${TYPE}
+	}
+)
+
+func (w *watchEvent${TYPE}) Type() k8s.WatchEventType {
+	return w.raw.Type 
+}
+
+func (w *watchEvent${TYPE}) Object() (*k8s.${TYPE}, error) {
+	if w.object != nil {
+		return w.object, nil
+	}
+	if w.raw.Type == k8s.WatchEventTypeError {
+		var status k8s.Status 
+		if err := w.raw.UnmarshalObject(&status); err != nil {
+			return nil, errors.Wrap(err, "failed to decode Status")
+		}
+		return nil, &status
+	}
+	var object k8s.${TYPE}
+	if err := w.raw.UnmarshalObject(&object); err != nil {
+		return nil, errors.Wrap(err, "failed to decode ${TYPE}")
+	}
+	w.object = &object 
+	return &object, nil
+}
 
 func ${APIPATH}GeneratePath(namespace, name string) string {
+    if namespace == "" && name == "" {
+        return "${API}/${APIPATH}${APIPATHEXT}"
+    }
     if name == "" {
         return "${API}/namespaces/"+namespace+"/${APIPATH}${APIPATHEXT}"
     }
@@ -72,11 +104,30 @@ func (c *Client) Create${TYPE}(namespace string, item *k8s.${TYPE}) (*k8s.${TYPE
 // List${TYPE}${APIPATHEXT} lists all ${TYPE}s in a namespace
 func (c *Client) List${TYPE}${APIPATHEXT}(namespace string, opts *k8s.ListOptions) (*k8s.${TYPE}List, error) {
 	var out k8s.${TYPE}List
-	_, err := c.do("GET", ${APIPATH}GeneratePath(namespace, "") + "?"+listOptionsQuery(opts), nil, &out)
+	_, err := c.do("GET", ${APIPATH}GeneratePath(namespace, "") + "?"+listOptionsQuery(opts, nil), nil, &out)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to list ${TYPE}s")
 	}
 	return &out, nil
+}
+
+// Watch${TYPE}${APIPATHEXT} watches all ${TYPE} changes in a namespace
+func (c *Client) Watch${TYPE}${APIPATHEXT}(namespace string, opts *k8s.WatchOptions, events chan k8s.${TYPE}WatchEvent) error {
+	if events == nil {
+		return errors.New("events must not be nil")
+	}
+	rawEvents := make(chan k8s.WatchEvent)
+	go func() {
+		for rawEvent := range rawEvents {
+			events <- &watchEvent${TYPE}{raw:rawEvent}
+		}
+		close(events)
+	}()
+	_, err := c.doWatch("GET", ${APIPATH}GeneratePath(namespace, "") + "?"+watchOptionsQuery(opts), nil, rawEvents)
+	if err != nil {
+		return errors.Wrap(err, "failed to watch ${TYPE}s")
+	}
+	return nil
 }
 
 // Delete${TYPE} deletes a single ${TYPE}. It will error if the ${TYPE} does not exist.

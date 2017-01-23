@@ -23,4 +23,9 @@ type (
 		LabelSelector LabelSelector
 		FieldSelector FieldSelector
 	}
+
+	WatchOptions struct {
+		ListOptions
+		ResourceVersion string
+	}
 )

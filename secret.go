@@ -6,8 +6,14 @@ type (
 		CreateSecret(namespace string, item *Secret) (*Secret, error)
 		GetSecret(namespace, name string) (result *Secret, err error)
 		ListSecrets(namespace string, opts *ListOptions) (*SecretList, error)
+		WatchSecrets(namespace string, opts *WatchOptions, events chan SecretWatchEvent) error
 		DeleteSecret(namespace, name string) error
 		UpdateSecret(namespace string, item *Secret) (*Secret, error)
+	}
+
+	SecretWatchEvent interface {
+		Type() WatchEventType
+		Object() (*Secret, error)
 	}
 
 	// SecretType is the type of secret.

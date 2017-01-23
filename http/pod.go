@@ -5,7 +5,40 @@ import (
 	"github.com/pkg/errors"
 )
 
+type (
+	watchEventPod struct {
+		raw    k8s.WatchEvent
+		object *k8s.Pod
+	}
+)
+
+func (w *watchEventPod) Type() k8s.WatchEventType {
+	return w.raw.Type
+}
+
+func (w *watchEventPod) Object() (*k8s.Pod, error) {
+	if w.object != nil {
+		return w.object, nil
+	}
+	if w.raw.Type == k8s.WatchEventTypeError {
+		var status k8s.Status
+		if err := w.raw.UnmarshalObject(&status); err != nil {
+			return nil, errors.Wrap(err, "failed to decode Status")
+		}
+		return nil, &status
+	}
+	var object k8s.Pod
+	if err := w.raw.UnmarshalObject(&object); err != nil {
+		return nil, errors.Wrap(err, "failed to decode Pod")
+	}
+	w.object = &object
+	return &object, nil
+}
+
 func podGeneratePath(namespace, name string) string {
+	if namespace == "" && name == "" {
+		return "/api/v1/pods"
+	}
 	if name == "" {
 		return "/api/v1/namespaces/" + namespace + "/pods"
 	}
@@ -39,11 +72,30 @@ func (c *Client) CreatePod(namespace string, item *k8s.Pod) (*k8s.Pod, error) {
 // ListPods lists all Pods in a namespace
 func (c *Client) ListPods(namespace string, opts *k8s.ListOptions) (*k8s.PodList, error) {
 	var out k8s.PodList
-	_, err := c.do("GET", podGeneratePath(namespace, "")+"?"+listOptionsQuery(opts), nil, &out)
+	_, err := c.do("GET", podGeneratePath(namespace, "")+"?"+listOptionsQuery(opts, nil), nil, &out)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to list Pods")
 	}
 	return &out, nil
+}
+
+// WatchPods watches all Pod changes in a namespace
+func (c *Client) WatchPods(namespace string, opts *k8s.WatchOptions, events chan k8s.PodWatchEvent) error {
+	if events == nil {
+		return errors.New("events must not be nil")
+	}
+	rawEvents := make(chan k8s.WatchEvent)
+	go func() {
+		for rawEvent := range rawEvents {
+			events <- &watchEventPod{raw: rawEvent}
+		}
+		close(events)
+	}()
+	_, err := c.doWatch("GET", podGeneratePath(namespace, "")+"?"+watchOptionsQuery(opts), nil, rawEvents)
+	if err != nil {
+		return errors.Wrap(err, "failed to watch Pods")
+	}
+	return nil
 }
 
 // DeletePod deletes a single Pod. It will error if the Pod does not exist.

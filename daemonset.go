@@ -6,8 +6,14 @@ type (
 		CreateDaemonSet(namespace string, item *DaemonSet) (*DaemonSet, error)
 		GetDaemonSet(namespace, name string) (result *DaemonSet, err error)
 		ListDaemonSets(namespace string, opts *ListOptions) (*DaemonSetList, error)
+		WatchDaemonSets(namespace string, opts *WatchOptions, events chan DaemonSetWatchEvent) error
 		DeleteDaemonSet(namespace, name string) error
 		UpdateDaemonSet(namespace string, item *DaemonSet) (*DaemonSet, error)
+	}
+
+	DaemonSetWatchEvent interface {
+		Type() WatchEventType
+		Object() (*DaemonSet, error)
 	}
 
 	// DaemonSet represents the configuration of a daemon set.

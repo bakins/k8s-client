@@ -5,8 +5,14 @@ type (
 		CreateNamespace(item *Namespace) (*Namespace, error)
 		GetNamespace(name string) (result *Namespace, err error)
 		ListNamespaces(opts *ListOptions) (*NamespaceList, error)
+		WatchNamespaces(opts *WatchOptions, events chan NamespaceWatchEvent) error
 		DeleteNamespace(name string) error
 		UpdateNamespace(item *Namespace) (*Namespace, error)
+	}
+
+	NamespaceWatchEvent interface {
+		Type() WatchEventType
+		Object() (*Namespace, error)
 	}
 
 	NamespaceSpec struct {

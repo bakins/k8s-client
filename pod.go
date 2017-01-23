@@ -47,8 +47,14 @@ type (
 		CreatePod(namespace string, item *Pod) (*Pod, error)
 		GetPod(namespace, name string) (result *Pod, err error)
 		ListPods(namespace string, opts *ListOptions) (*PodList, error)
+		WatchPods(namespace string, opts *WatchOptions, events chan PodWatchEvent) error
 		DeletePod(namespace, name string) error
 		UpdatePod(namespace string, item *Pod) (*Pod, error)
+	}
+
+	PodWatchEvent interface {
+		Type() WatchEventType
+		Object() (*Pod, error)
 	}
 
 	Pod struct {

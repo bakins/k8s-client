@@ -319,25 +319,91 @@ func (c *Client) do(method, path string, in interface{}, out interface{}, codes 
 	return resp.StatusCode, nil
 }
 
-func listOptionsQuery(opts *k8s.ListOptions) string {
-	if opts == nil {
-		return ""
-	}
-	val := url.Values{}
-	if opts.LabelSelector.MatchLabels != nil && len(opts.LabelSelector.MatchLabels) > 0 {
-		var labels []string
-		for k, v := range opts.LabelSelector.MatchLabels {
-			labels = append(labels, fmt.Sprintf("%s=%s", k, v))
-		}
-		val.Set("labelSelector", strings.Join(labels, ","))
-	}
-	if opts.FieldSelector != nil && len(opts.FieldSelector) > 0 {
-		var fields []string
-		for k, v := range opts.FieldSelector {
-			fields = append(fields, fmt.Sprintf("%s=%s", k, v))
-		}
-		val.Set("fieldSelector", strings.Join(fields, ","))
+func (c *Client) doWatch(method, path string, in interface{}, out chan k8s.WatchEvent, codes ...int) (int, error) {
+	req, err := c.newRequest(method, path, in)
+	if err != nil {
+		return 0, err
 	}
 
+	resp, err := c.client.Do(req)
+	if err != nil {
+		return 0, err
+	}
+
+	// make errcheck happy
+	defer func() {
+		_ = resp.Body.Close()
+	}()
+
+	if len(codes) == 0 {
+		codes = []int{
+			200,
+		}
+	}
+
+	found := false
+	for _, i := range codes {
+		if i == resp.StatusCode {
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		status, err := readStatus(resp.Body)
+		if err != nil {
+			return resp.StatusCode, errors.Wrapf(err, "unable to read status: %d", resp.StatusCode)
+		}
+		return resp.StatusCode, status
+	}
+
+	if out != nil {
+		decoder := json.NewDecoder(resp.Body)
+		for {
+			var ev k8s.WatchEvent
+			if err := decoder.Decode(&ev); err != nil {
+				return resp.StatusCode, err
+			}
+			out <- ev
+		}
+	}
+	return resp.StatusCode, nil
+}
+
+func listOptionsQuery(opts *k8s.ListOptions, val url.Values) string {
+	if opts != nil {
+		if val == nil {
+			val = url.Values{}
+		}
+		if opts.LabelSelector.MatchLabels != nil && len(opts.LabelSelector.MatchLabels) > 0 {
+			var labels []string
+			for k, v := range opts.LabelSelector.MatchLabels {
+				labels = append(labels, fmt.Sprintf("%s=%s", k, v))
+			}
+			val.Set("labelSelector", strings.Join(labels, ","))
+		}
+		if opts.FieldSelector != nil && len(opts.FieldSelector) > 0 {
+			var fields []string
+			for k, v := range opts.FieldSelector {
+				fields = append(fields, fmt.Sprintf("%s=%s", k, v))
+			}
+			val.Set("fieldSelector", strings.Join(fields, ","))
+		}
+	}
+	if val == nil {
+		return ""
+	}
+	return val.Encode()
+}
+
+func watchOptionsQuery(opts *k8s.WatchOptions) string {
+	val := url.Values{}
+	val.Set("watch", "true")
+	if opts != nil {
+		if opts.ResourceVersion != "" {
+			val.Set("resourceVersion", opts.ResourceVersion)
+		}
+		return listOptionsQuery(&opts.ListOptions, val)
+	}
 	return val.Encode()
 }

@@ -6,8 +6,14 @@ type (
 		CreateEndpoints(namespace string, item *Endpoints) (*Endpoints, error)
 		GetEndpoints(namespace, name string) (result *Endpoints, err error)
 		ListEndpoints(namespace string, opts *ListOptions) (*EndpointsList, error)
+		WatchEndpoints(namespace string, opts *WatchOptions, events chan EndpointsWatchEvent) error
 		DeleteEndpoints(namespace, name string) error
 		UpdateEndpoints(namespace string, item *Endpoints) (*Endpoints, error)
+	}
+
+	EndpointsWatchEvent interface {
+		Type() WatchEventType
+		Object() (*Endpoints, error)
 	}
 
 	// Endpoints is a collection of endpoints that implement the actual service.

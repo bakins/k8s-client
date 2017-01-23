@@ -5,7 +5,40 @@ import (
 	"github.com/pkg/errors"
 )
 
+type (
+	watchEventService struct {
+		raw    k8s.WatchEvent
+		object *k8s.Service
+	}
+)
+
+func (w *watchEventService) Type() k8s.WatchEventType {
+	return w.raw.Type
+}
+
+func (w *watchEventService) Object() (*k8s.Service, error) {
+	if w.object != nil {
+		return w.object, nil
+	}
+	if w.raw.Type == k8s.WatchEventTypeError {
+		var status k8s.Status
+		if err := w.raw.UnmarshalObject(&status); err != nil {
+			return nil, errors.Wrap(err, "failed to decode Status")
+		}
+		return nil, &status
+	}
+	var object k8s.Service
+	if err := w.raw.UnmarshalObject(&object); err != nil {
+		return nil, errors.Wrap(err, "failed to decode Service")
+	}
+	w.object = &object
+	return &object, nil
+}
+
 func serviceGeneratePath(namespace, name string) string {
+	if namespace == "" && name == "" {
+		return "/api/v1/services"
+	}
 	if name == "" {
 		return "/api/v1/namespaces/" + namespace + "/services"
 	}
@@ -39,11 +72,30 @@ func (c *Client) CreateService(namespace string, item *k8s.Service) (*k8s.Servic
 // ListServices lists all Services in a namespace
 func (c *Client) ListServices(namespace string, opts *k8s.ListOptions) (*k8s.ServiceList, error) {
 	var out k8s.ServiceList
-	_, err := c.do("GET", serviceGeneratePath(namespace, "")+"?"+listOptionsQuery(opts), nil, &out)
+	_, err := c.do("GET", serviceGeneratePath(namespace, "")+"?"+listOptionsQuery(opts, nil), nil, &out)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to list Services")
 	}
 	return &out, nil
+}
+
+// WatchServices watches all Service changes in a namespace
+func (c *Client) WatchServices(namespace string, opts *k8s.WatchOptions, events chan k8s.ServiceWatchEvent) error {
+	if events == nil {
+		return errors.New("events must not be nil")
+	}
+	rawEvents := make(chan k8s.WatchEvent)
+	go func() {
+		for rawEvent := range rawEvents {
+			events <- &watchEventService{raw: rawEvent}
+		}
+		close(events)
+	}()
+	_, err := c.doWatch("GET", serviceGeneratePath(namespace, "")+"?"+watchOptionsQuery(opts), nil, rawEvents)
+	if err != nil {
+		return errors.Wrap(err, "failed to watch Services")
+	}
+	return nil
 }
 
 // DeleteService deletes a single Service. It will error if the Service does not exist.
