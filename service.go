@@ -16,6 +16,11 @@ const (
 	// to 'NodePort' type.
 	ServiceTypeLoadBalancer ServiceType = "LoadBalancer"
 
+	// ServiceTypeExternalName means a service that does not have selectors.
+	// It does not define any ports or endpoints.
+	// Rather, it serves as a way to return an alias to an external service residing outside the cluster.
+	ServiceTypeExternalName ServiceType = "ExternalName"
+
 	// ServiceAffinityClientIP is the Client IP based.
 	ServiceAffinityClientIP ServiceAffinity = "ClientIP"
 
@@ -106,6 +111,10 @@ type (
 		// ExternalIPs are used by external load balancers, or can be set by
 		// users to handle external traffic that arrives at a node.
 		ExternalIPs []string `json:"externalIPs,omitempty"`
+
+		// ExternalName is the external reference that kubedns or equivalent will return as a CNAME record for this service.
+		// No proxying will be involved. Must be a valid DNS name and requires Type to be ExternalName
+		ExternalName string `json:"externalName,omitempty"`
 
 		// Only applies to Service Type: LoadBalancer
 		// LoadBalancer will get created with the IP specified in this field.
