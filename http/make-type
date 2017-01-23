@@ -6,6 +6,9 @@ APIPATH=`echo ${TYPE} | tr '[:upper:]' '[:lower:]'`
 APIVERSION=${2:-v1}
 
 APIPATHEXT=${3:-s}
+if [ ${APIPATHEXT} == "-" ];then 
+	APIPATHEXT=
+fi
 
 case ${APIVERSION} in
     "extensions/v1beta1")
