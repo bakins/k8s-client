@@ -1,7 +1,5 @@
 package client
 
-import "github.com/bakins/k8s-client/intstr"
-
 const (
 	// Kill all existing pods before creating new ones.
 	RecreateDeploymentStrategyType DeploymentStrategyType = "Recreate"
@@ -95,7 +93,7 @@ type (
 		// can be scaled down further, followed by scaling up the new RC, ensuring
 		// that at least 70% of original number of pods are available at all times
 		// during the update.
-		MaxUnavailable intstr.IntOrString `json:"maxUnavailable,omitempty"`
+		MaxUnavailable IntOrString `json:"maxUnavailable,omitempty"`
 
 		// The maximum number of pods that can be scheduled above the original number of
 		// pods.
@@ -107,7 +105,7 @@ type (
 		// immediately when the rolling update starts. Once old pods have been killed,
 		// new RC can be scaled up further, ensuring that total number of pods running
 		// at any time during the update is atmost 130% of original pods.
-		MaxSurge intstr.IntOrString `json:"maxSurge,omitempty"`
+		MaxSurge IntOrString `json:"maxSurge,omitempty"`
 	}
 
 	RollbackConfig struct {

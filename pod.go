@@ -1,7 +1,5 @@
 package client
 
-import "github.com/bakins/k8s-client/intstr"
-
 const (
 	RestartPolicyAlways    RestartPolicy = "Always"
 	RestartPolicyOnFailure RestartPolicy = "OnFailure"
@@ -332,7 +330,7 @@ type (
 		// Optional: Path to access on the HTTP server.
 		Path string `json:"path,omitempty"`
 		// Required: Name or number of the port to access on the container.
-		Port intstr.IntOrString `json:"port,omitempty"`
+		Port IntOrString `json:"port,omitempty"`
 		// Optional: Host name to connect to, defaults to the pod IP. You
 		// probably want to set "Host" in httpHeaders instead.
 		Host string `json:"host,omitempty"`
@@ -369,7 +367,7 @@ type (
 	// TCPSocketAction describes an action based on opening a socket
 	TCPSocketAction struct {
 		// Required: Port to connect to.
-		Port intstr.IntOrString `json:"port,omitempty"`
+		Port IntOrString `json:"port,omitempty"`
 	}
 
 	// Lifecycle describes actions that the management system should take in response to container lifecycle events. For the PostStart and PreStop lifecycle handlers, management of the container blocks until the action is complete, unless the container process fails, in which case the handler is aborted.
