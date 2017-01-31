@@ -14,7 +14,7 @@ import (
 	"os"
 	"strings"
 
-	k8s "github.com/YakLabs/k8s-client"
+	k8s "github.com/bakins/k8s-client"
 	"github.com/pkg/errors"
 )
 

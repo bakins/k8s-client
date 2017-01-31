@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/YakLabs/k8s-client/http"
+	"github.com/bakins/k8s-client/http"
 )
 
 func ExampleNew() {

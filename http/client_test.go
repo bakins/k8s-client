@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/YakLabs/k8s-client/http"
+	"github.com/bakins/k8s-client/http"
 	"github.com/stretchr/testify/require"
 )
 
