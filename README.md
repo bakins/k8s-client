@@ -1,7 +1,12 @@
-k8s-client [![GoDoc](https://godoc.org/github.com/YakLabs/k8s-client?status.svg)](https://godoc.org/github.com/YakLabs/k8s-client)
+k8s-client [![GoDoc](https://godoc.org/github.com/bakins/k8s-client?status.svg)](https://godoc.org/github.com/bakins/k8s-client)
 =======
 
 k8s-client is a Kubernetes client for Go.
+
+# Notice
+
+Master should not be considered stable.  Please vendor a tagged version.  I will be
+making breaking changes to the API.  Also import paths have changed to `github.com/bakins/k8s-client`
 
 ## Status
 
@@ -30,7 +35,7 @@ under the Apache 2 License.
 ## Usage
 
 See
-[![GoDoc](https://godoc.org/github.com/YakLabs/k8s-client?status.svg)](https://godoc.org/github.com/YakLabs/k8s-client)
+[![GoDoc](https://godoc.org/github.com/bakins/k8s-client?status.svg)](https://godoc.org/github.com/bakins/k8s-client)
 for documentation.
 
 ## Testing

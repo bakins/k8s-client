@@ -1,6 +1,6 @@
 package client
 
-import "github.com/YakLabs/k8s-client/intstr"
+import "github.com/bakins/k8s-client/intstr"
 
 type (
 	// IngressInterface has methods to work with Ingress resources.
