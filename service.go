@@ -1,7 +1,5 @@
 package client
 
-import "github.com/bakins/k8s-client/intstr"
-
 const (
 	// ServiceTypeClusterIP means a service will only be accessible inside the
 	// cluster, via the ClusterIP.
@@ -158,7 +156,7 @@ type (
 		// of the 'port' field is used (an identity map).
 		// This field is ignored for services with clusterIP=None, and should be
 		// omitted or set equal to the 'port' field.
-		TargetPort intstr.IntOrString `json:"targetPort"`
+		TargetPort IntOrString `json:"targetPort"`
 
 		// The port on each node on which this service is exposed.
 		// Default is to auto-allocate a port if the ServiceType of this Service requires one.

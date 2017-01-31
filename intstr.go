@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package intstr
+package client
 
 import (
 	"encoding/json"
@@ -22,8 +22,6 @@ import (
 	"math"
 	"strconv"
 	"strings"
-
-	"github.com/google/gofuzz"
 )
 
 // IntOrString is a type that can hold an int32 or a string.  When used in
@@ -98,21 +96,6 @@ func (intstr IntOrString) MarshalJSON() ([]byte, error) {
 		return json.Marshal(intstr.StrVal)
 	default:
 		return []byte{}, fmt.Errorf("impossible IntOrString.Type")
-	}
-}
-
-func (intstr *IntOrString) Fuzz(c fuzz.Continue) {
-	if intstr == nil {
-		return
-	}
-	if c.RandBool() {
-		intstr.Type = Int
-		c.Fuzz(&intstr.IntVal)
-		intstr.StrVal = ""
-	} else {
-		intstr.Type = String
-		intstr.IntVal = 0
-		c.Fuzz(&intstr.StrVal)
 	}
 }
 
