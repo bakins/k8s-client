@@ -36,8 +36,8 @@ func TestConfigMapCreate(t *testing.T) {
 		assert.Nil(t, err)
 		assert.NotNil(t, out)
 
-		in.Data = map[string][]byte{
-			"foo": []byte("value"),
+		in.Data = map[string]string{
+			"foo": "value",
 		}
 
 		out, err = c.UpdateConfigMap(n.Name, in)
