@@ -30,6 +30,7 @@ import (
 //go:generate ./make-type Service v1
 //go:generate ./make-type ServiceAccount v1
 //go:generate ./make-type Endpoints v1 -
+//go:generate ./make-type Event v1
 
 const (
 	tokenFile = "/var/run/secrets/kubernetes.io/serviceaccount/token"
