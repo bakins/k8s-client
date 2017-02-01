@@ -73,24 +73,45 @@ type (
 		GetAnnotations() map[string]string
 		GetLabels() map[string]string
 		SetLabels(labels map[string]string)
+		GetAPIversion() string
 	}
 
 	NamespacedObject interface {
 		Object
 		GetNamespace() string
+		GetName() string
+		GetUID() UID
+		GetResourceVersion() string
 	}
+
 	ListObject interface {
 		Object
 		GetItems()
 	}
 )
 
+func (t *TypeMeta) GetAPIversion() string {
+	return t.APIVersion
+}
+
 func (t *TypeMeta) GetKind() string {
 	return t.Kind
 }
 
+func (o *ObjectMeta) GetResourceVersion() string {
+	return o.ResourceVersion
+}
+
 func (o *ObjectMeta) GetNamespace() string {
 	return o.Namespace
+}
+
+func (o *ObjectMeta) GetName() string {
+	return o.Name
+}
+
+func (o *ObjectMeta) GetUID() UID {
+	return o.UID
 }
 
 func (o *ObjectMeta) GetAnnotations() map[string]string {
@@ -120,5 +141,17 @@ func NewObjectMeta(namespace, name string) ObjectMeta {
 		Name:        name,
 		Labels:      make(map[string]string),
 		Annotations: make(map[string]string),
+	}
+}
+
+// NewObjectReference creates a new ObjectReference from the given object
+func NewObjectReference(o NamespacedObject) *ObjectReference {
+	return &ObjectReference{
+		Kind:            o.GetKind(),
+		Namespace:       o.GetNamespace(),
+		Name:            o.GetName(),
+		UID:             o.GetUID(),
+		APIVersion:      o.GetAPIversion(),
+		ResourceVersion: o.GetResourceVersion(),
 	}
 }
