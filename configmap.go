@@ -20,7 +20,7 @@ type (
 	ConfigMap struct {
 		TypeMeta   `json:",inline"`
 		ObjectMeta `json:"metadata,omitempty"`
-		Data       map[string][]byte `json:"data,omitempty"`
+		Data       map[string]string `json:"data,omitempty"`
 	}
 
 	ConfigMapList struct {
@@ -36,6 +36,6 @@ func NewConfigMap(namespace, name string) *ConfigMap {
 	return &ConfigMap{
 		TypeMeta:   NewTypeMeta("ConfigMap", "v1"),
 		ObjectMeta: NewObjectMeta(namespace, name),
-		Data:       make(map[string][]byte),
+		Data:       make(map[string]string),
 	}
 }
